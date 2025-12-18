@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e40af"/>
+      <stop offset="100%" style="stop-color:#3b82f6"/>
+    </linearGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="32" cy="32" r="30" fill="url(#skyGrad)"/>
+  <!-- Airplane silhouette -->
+  <g fill="#ffffff">
+    <!-- Fuselage -->
+    <path d="M32 12 L35 20 L35 42 L38 50 L26 50 L29 42 L29 20 Z"/>
+    <!-- Wings -->
+    <path d="M16 28 L29 32 L29 36 L16 34 Z"/>
+    <path d="M48 28 L35 32 L35 36 L48 34 Z"/>
+    <!-- Tail wings -->
+    <path d="M24 46 L29 44 L29 48 L24 50 Z"/>
+    <path d="M40 46 L35 44 L35 48 L40 50 Z"/>
+  </g>
+  <!-- Clipboard/kneeboard outline -->
+  <rect x="20" y="22" width="24" height="30" rx="2" fill="none" stroke="#fbbf24" stroke-width="2.5"/>
+  <line x1="24" y1="28" x2="40" y2="28" stroke="#fbbf24" stroke-width="1.5"/>
+  <line x1="24" y1="33" x2="40" y2="33" stroke="#fbbf24" stroke-width="1.5"/>
+  <line x1="24" y1="38" x2="40" y2="38" stroke="#fbbf24" stroke-width="1.5"/>
+  <line x1="24" y1="43" x2="36" y2="43" stroke="#fbbf24" stroke-width="1.5"/>
+</svg>

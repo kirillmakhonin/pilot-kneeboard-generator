@@ -1,0 +1,16 @@
+{
+    "name": "Pilot Kneeboard Generator",
+    "short_name": "Kneeboard",
+    "description": "Generate professional kneeboard reference cards for pilots - speeds, weight & balance, and emergency checklists",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#1e293b",
+    "theme_color": "#dc2626",
+    "icons": [
+        {
+            "src": "/favicon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml"
+        }
+    ]
+}
