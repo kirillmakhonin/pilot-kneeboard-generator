@@ -26,7 +26,7 @@ import type { AircraftData } from '../types';
 
 const INITIAL_DATA: AircraftData = {
     aircraftModel: "DIAMOND DA20-C1",
-    footer: "DRAGONFLY AVIATION",
+    footer: "FLIGHT SCHOOL",
     speeds: [
         { label: "Max Speed in Rough Air V_NO", value: "118 Kts" },
         { label: "Max Maneuvering Speed V_A", value: "106 Kts" },

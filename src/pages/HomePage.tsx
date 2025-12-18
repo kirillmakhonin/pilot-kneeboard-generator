@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Plane, Calculator, FileText, Settings, ChevronRight, Sparkles } from 'lucide-react';
+import { Plane, Calculator, Settings, ChevronRight, Sparkles } from 'lucide-react';
 
 // Prefab data for quick start
 const DA20_SPEEDS_DATA = {
