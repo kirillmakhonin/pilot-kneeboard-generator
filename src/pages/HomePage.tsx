@@ -1,108 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Plane, Calculator, Settings, ChevronRight, Sparkles } from 'lucide-react';
-
-// Prefab data for quick start
-const DA20_SPEEDS_DATA = {
-    aircraftModel: "DIAMOND DA20-C1",
-    footer: "FLIGHT SCHOOL",
-    speeds: [
-        { label: "Max Speed in Rough Air V_NO", value: "118 Kts" },
-        { label: "Max Maneuvering Speed V_A", value: "106 Kts" },
-        { label: "Max Speed Flaps T/O V_FE T/O", value: "100 Kts" },
-        { label: "Max Speed Flaps LDG V_FE LDG", value: "78 Kts" },
-        { label: "Never Exceed Speed V_NE", value: "164 Kts" },
-        { label: "Stall Speed Flaps Cruise V_S", value: "44 Kts" },
-        { label: "Stall Speed Flaps LDG V_SO", value: "36 Kts" }
-    ],
-    takeoff: [
-        { label: "Normal Rotate", value: "50-55 Kts" },
-        { label: "Climb Out (Flaps T/O)", value: "65 Kts" },
-        { label: "Climb Out (Flaps Cruise)", value: "75 Kts" },
-        { label: "Short Field Rotate", value: "52 Kts" },
-        { label: "V_X Cruise", value: "60 Kts" },
-        { label: "V_Y Cruise", value: "75 Kts" }
-    ],
-    landing: [
-        { label: "Normal Approach Flaps LDG", value: "65 Kts" },
-        { label: "Approach Flaps UP", value: "70 Kts" },
-        { label: "Short Field Approach Flaps LDG", value: "55-60 Kts" },
-        { label: "Max Demonstrated X-Wind", value: "20 Kts" }
-    ],
-    emergency: [
-        { label: "Best Glide (Flaps UP)", value: "73 Kts" },
-        { label: "Glide Ratio", value: "11:1" },
-        { label: "Distance per 1000ft AGL", value: "1.8 NM" }
-    ],
-    briefing: []
-};
-
-const C172S_SPEEDS_DATA = {
-    aircraftModel: "CESSNA 172S SKYHAWK",
-    footer: "FLIGHT SCHOOL",
-    speeds: [
-        { label: "Max Speed in Rough Air V_NO", value: "129 Kts" },
-        { label: "Max Maneuvering Speed V_A", value: "99 Kts" },
-        { label: "Max Speed Flaps 10° V_FE", value: "110 Kts" },
-        { label: "Max Speed Flaps FULL V_FE", value: "85 Kts" },
-        { label: "Never Exceed Speed V_NE", value: "163 Kts" },
-        { label: "Stall Speed Clean V_S1", value: "53 Kts" },
-        { label: "Stall Speed Flaps FULL V_SO", value: "48 Kts" }
-    ],
-    takeoff: [
-        { label: "Rotation Speed V_R", value: "55 Kts" },
-        { label: "Best Rate of Climb V_Y", value: "74 Kts" },
-        { label: "Best Angle of Climb V_X", value: "62 Kts" },
-        { label: "Short Field Obstacle Clear", value: "59 Kts" }
-    ],
-    landing: [
-        { label: "Normal Approach", value: "65-75 Kts" },
-        { label: "Short Field Approach", value: "62 Kts" },
-        { label: "Max Demonstrated X-Wind", value: "15 Kts" }
-    ],
-    emergency: [
-        { label: "Best Glide", value: "68 Kts" },
-        { label: "Glide Ratio", value: "9:1" },
-        { label: "Distance per 1000ft AGL", value: "1.5 NM" }
-    ],
-    briefing: []
-};
-
-const C172S_WB_DATA = {
-    aircraft: "Cessna 172S",
-    tailNumber: "N12345",
-    makeModel: "CESSNA 172S SKYHAWK",
-    date: new Date().toISOString().split('T')[0],
-    category: "Normal",
-    maxTakeoffWeight: "2550",
-    referenceDatum: "40.0",
-    positions: [
-        { name: "Basic Empty Weight", weight: "1663", arm: "40.5", moment: "67352" },
-        { name: "Pilot", weight: "170", arm: "37.0", moment: "6290" },
-        { name: "Front Passenger", weight: "0", arm: "37.0", moment: "0" },
-        { name: "Rear Passengers", weight: "0", arm: "73.0", moment: "0" },
-        { name: "Baggage Area 1", weight: "0", arm: "95.0", moment: "0" },
-        { name: "Fuel (53 gal usable)", weight: "318", arm: "48.0", moment: "15264" }
-    ],
-    footer: "FLIGHT SCHOOL"
-};
-
-const DA20_WB_DATA = {
-    aircraft: "Diamond DA20-C1",
-    tailNumber: "N12345",
-    makeModel: "DIAMOND DA20-C1 ECLIPSE",
-    date: new Date().toISOString().split('T')[0],
-    category: "Normal",
-    maxTakeoffWeight: "1764",
-    referenceDatum: "0.0",
-    positions: [
-        { name: "Basic Empty Weight", weight: "1232", arm: "93.7", moment: "115438" },
-        { name: "Front Occupants", weight: "340", arm: "90.0", moment: "30600" },
-        { name: "Baggage", weight: "0", arm: "123.0", moment: "0" },
-        { name: "Fuel (24 gal usable)", weight: "144", arm: "94.0", moment: "13536" }
-    ],
-    footer: "FLIGHT SCHOOL"
-};
+import { Plane, Calculator, Settings, ChevronRight, Sparkles, FileText } from 'lucide-react';
+import { C172N_DATA, C172N_WB_DATA, C172S_SPEEDS_DATA, C172S_WB_DATA, DA20_SPEEDS_DATA, DA20_WB_DATA } from '../data/homePresets';
 
 const encodeData = (data: unknown) => btoa(unescape(encodeURIComponent(JSON.stringify(data))));
 
@@ -151,6 +50,15 @@ const generators: Generator[] = [
         color: 'red',
         status: 'active',
         features: ['Emergency Checklists', 'Quick Reference', 'Critical Procedures']
+    },
+    {
+        id: 'cfi-endorsements',
+        title: 'CFI Endorsements',
+        description: 'Generate professional logbook endorsements from templates or custom text. Print on Avery labels.',
+        icon: FileText,
+        color: 'purple',
+        status: 'active',
+        features: ['FAA Templates', 'Custom Endorsements', 'Avery 18163 Support', 'PDF Export']
     }
 ];
 
@@ -315,6 +223,33 @@ export const HomePage: React.FC = () => {
                                 </Link>
                                 <Link
                                     to={`/weight-balance?data=${encodeData(C172S_WB_DATA)}`}
+                                    className="flex-1 text-center px-4 py-2 bg-green-50 hover:bg-green-100 text-green-700 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
+                                >
+                                    Weight & Balance
+                                </Link>
+                            </div>
+                        </div>
+
+                        {/* Cessna 172N */}
+                        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="bg-emerald-100 p-2 rounded-lg">
+                                    <Plane className="text-emerald-600" size={20} />
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-slate-900">Cessna 172N Skyhawk</h4>
+                                    <p className="text-xs text-slate-500">Classic training aircraft</p>
+                                </div>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                <Link
+                                    to={`/speeds-briefing?data=${encodeData(C172N_DATA)}`}
+                                    className="flex-1 text-center px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
+                                >
+                                    Speeds & Briefing
+                                </Link>
+                                <Link
+                                    to={`/weight-balance?data=${encodeData(C172N_WB_DATA)}`}
                                     className="flex-1 text-center px-4 py-2 bg-green-50 hover:bg-green-100 text-green-700 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
                                 >
                                     Weight & Balance

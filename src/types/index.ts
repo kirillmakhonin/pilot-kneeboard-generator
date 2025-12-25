@@ -39,6 +39,19 @@ export interface WeightBalanceData {
     [key: string]: unknown;
 }
 
+export interface CFIEndorsementData {
+    cfiName: string;
+    cfiNumber: string;
+    expirationDate: string;
+    endorsementTitle: string;
+    endorsementText: string;
+    endorsementType: 'template' | 'custom';
+    templateId?: string;
+    fieldValues?: Record<string, string>;
+    footer: string;
+    [key: string]: unknown;
+}
+
 /**
  * Type of the checklist
  */

@@ -53,6 +53,10 @@ export function useGeneratorData<T extends Record<string, unknown>>(storageKey: 
         saveToLocal(newData);
     };
 
+    const updateState = (newData: T) => {
+        saveToLocal(newData);
+    };
+
     const addItem = (category: keyof T, template: unknown) => {
         const newData = { ...data };
         (newData as Record<keyof T, unknown[]>)[category].push(template);
@@ -157,6 +161,7 @@ export function useGeneratorData<T extends Record<string, unknown>>(storageKey: 
         copySuccess,
         setImportError,
         getShareableUrl,
-        copyShareableUrl
+        copyShareableUrl,
+        updateState
     };
 }
