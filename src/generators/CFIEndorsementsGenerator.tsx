@@ -27,6 +27,7 @@ const INITIAL_DATA: CFIEndorsementData = {
     cfiName: "",
     cfiNumber: "",
     expirationDate: "",
+    endorsementDate: new Date().toISOString().slice(0, 10),
     endorsementTitle: "",
     endorsementText: "",
     endorsementType: 'template',
@@ -86,10 +87,15 @@ export const CFIEndorsementsGenerator: React.FC = () => {
 
     const generatePDF = (mode: string) => {
         if (!isPdfLibLoaded) return;
+        const displayTitle = getDisplayTitle();
+        const dataForPrint: CFIEndorsementData = {
+            ...data,
+            endorsementTitle: displayTitle
+        };
         if (mode === 'single_2x4') {
-            generateCFIEndorsementPDF(data, 'single_2x4');
+            generateCFIEndorsementPDF(dataForPrint, 'single_2x4');
         } else {
-            generateCFIEndorsementPDF(data, 'avery', labelPosition, averyTemplate);
+            generateCFIEndorsementPDF(dataForPrint, 'avery', labelPosition, averyTemplate);
         }
     };
 
@@ -159,7 +165,34 @@ export const CFIEndorsementsGenerator: React.FC = () => {
         return text;
     };
 
+    const formatLocalDate = (yyyyMmDd: string) => {
+        const match = /^\d{4}-\d{2}-\d{2}$/.test(yyyyMmDd);
+        if (!match) return '';
+
+        const [y, m, d] = yyyyMmDd.split('-').map((v) => Number(v));
+        const dt = new Date(y, m - 1, d);
+        if (Number.isNaN(dt.getTime())) return '';
+        return dt.toLocaleDateString();
+    };
+
     const currentTemplate = ENDORSEMENT_TEMPLATES.find(t => t.id === data.templateId);
+
+    const getDisplayTitle = () => {
+        const baseTitle = data.endorsementTitle || 'Endorsement';
+
+        const template = currentTemplate;
+        const id = template?.id || data.templateId || '';
+        const farRef = template?.farReference || '';
+
+        const prefix = id ? `${id} - ` : '';
+        const suffix = farRef ? `: ${farRef}` : '';
+
+        if (template?.title) {
+            return `${prefix}${template.title}${suffix}`;
+        }
+
+        return `${prefix}${baseTitle}${suffix}`;
+    };
 
     return (
         <div className="min-h-screen bg-slate-100 text-slate-900 font-sans">
@@ -206,7 +239,7 @@ export const CFIEndorsementsGenerator: React.FC = () => {
                             <Settings2 className="text-blue-600" size={20} />
                             <h2 className="text-lg font-bold">CFI Information</h2>
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                             <div className="space-y-1">
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">CFI Name</label>
                                 <input
@@ -234,6 +267,15 @@ export const CFIEndorsementsGenerator: React.FC = () => {
                                     value={data.expirationDate}
                                     onChange={(e) => updateField('expirationDate', null, '', e.target.value)}
                                     placeholder="e.g. 12/2026"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded px-3 py-2 text-sm font-bold focus:ring-1 focus:ring-blue-500 outline-none"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Date</label>
+                                <input
+                                    type="date"
+                                    value={data.endorsementDate}
+                                    onChange={(e) => updateField('endorsementDate', null, '', e.target.value)}
                                     className="w-full bg-slate-50 border border-slate-200 rounded px-3 py-2 text-sm font-bold focus:ring-1 focus:ring-blue-500 outline-none"
                                 />
                             </div>
@@ -421,7 +463,7 @@ export const CFIEndorsementsGenerator: React.FC = () => {
                         <div className="flex-1 flex flex-col justify-between">
                             <div className="space-y-0.5">
                                 <h3 className="font-bold text-center border-b-[1.5px] border-slate-900 pb-0.5 mb-0.5 text-xs leading-tight">
-                                    {data.endorsementTitle || "Endorsement Title"}
+                                    {getDisplayTitle() || "Endorsement Title"}
                                 </h3>
                                 <div className="text-[9px] leading-[1.15] text-justify whitespace-pre-wrap font-serif">
                                     {getProcessedText()
@@ -445,7 +487,7 @@ export const CFIEndorsementsGenerator: React.FC = () => {
                                         <p className="text-[7px] font-bold uppercase text-slate-500">CFI Signature</p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-[8px] font-bold">{new Date().toLocaleDateString()}</p>
+                                        <p className="text-[8px] font-bold">{formatLocalDate(data.endorsementDate) || new Date().toLocaleDateString()}</p>
                                         <p className="text-[7px] font-bold uppercase text-slate-500">Date</p>
                                     </div>
                                 </div>

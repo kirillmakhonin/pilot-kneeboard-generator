@@ -103,6 +103,7 @@ export interface CFIEndorsementData {
     cfiName: string;
     cfiNumber: string;
     expirationDate: string;
+    endorsementDate: string;
     endorsementTitle: string;
     endorsementText: string;
     endorsementType: 'template' | 'custom';

@@ -1,6 +1,16 @@
 import jsPDF from 'jspdf';
 import type { CFIEndorsementData } from '../../types';
 
+const formatLocalDate = (yyyyMmDd: string) => {
+    const match = /^\d{4}-\d{2}-\d{2}$/.test(yyyyMmDd);
+    if (!match) return null;
+
+    const [y, m, d] = yyyyMmDd.split('-').map((v) => Number(v));
+    const dt = new Date(y, m - 1, d);
+    if (Number.isNaN(dt.getTime())) return null;
+    return dt.toLocaleDateString();
+};
+
 export const generateCFIEndorsementPDF = (
     data: CFIEndorsementData,
     mode: string, // 'single_2x4' | 'avery'
@@ -171,7 +181,7 @@ export const generateCFIEndorsementPDF = (
         pdf.setTextColor(0);
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(5.5);
-        const dateStr = new Date().toLocaleDateString();
+        const dateStr = (data.endorsementDate && formatLocalDate(data.endorsementDate)) || new Date().toLocaleDateString();
         pdf.text(dateStr, startX + contentW, footerY + 2, { align: 'right' });
         pdf.setTextColor(150);
         pdf.setFontSize(4.5);
