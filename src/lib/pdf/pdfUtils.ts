@@ -21,7 +21,7 @@ export const addSectionHeader = (doc: jsPDF, text: string, currentY: number, xOf
     doc.rect(xOffset + 5, currentY - 4, stripWidth - 10, headerHeight, 'F');
 
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(isCombo ? 8 : 9);
+    doc.setFontSize(isCombo ? 10 : 11);
     doc.setTextColor(isEmergency ? 180 : 40, 0, 0);
 
     const lines = doc.splitTextToSize(text.toUpperCase(), stripWidth - 10);
@@ -32,14 +32,14 @@ export const addSectionHeader = (doc: jsPDF, text: string, currentY: number, xOf
     });
 
     doc.setTextColor(40);
-    return currentY + (isCombo ? 5 : 6);
+    return currentY + (isCombo ? 7 : 8);
 };
 
 export const addRowWithDots = (doc: jsPDF, label: string, value: string, currentY: number, xOffset: number, stripWidth: number, mode: 'individual' | 'combo') => {
     const isCombo = mode === 'combo';
-    const normalSize = isCombo ? 7 : 7.5;
-    const subSize = isCombo ? 5 : 5.5;
-    const spacing = isCombo ? 4 : 4.5;
+    const normalSize = isCombo ? 8 : 8.5;
+    const subSize = isCombo ? 6 : 6.5;
+    const spacing = isCombo ? 5 : 5.5;
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(normalSize);

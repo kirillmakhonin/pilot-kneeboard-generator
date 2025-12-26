@@ -125,6 +125,7 @@ export const EmergencyChecklistItemState = {
     CHECK_LINE: 'check-line',
     SUBTITLE: 'subtitle',
     CONDITION: 'condition',
+    INFO: 'info',
 }
 
 export interface EmergencyChecklistItem {
@@ -133,6 +134,8 @@ export interface EmergencyChecklistItem {
      * Content of the item
      */
     title: string;
+
+    content?: string;
 
     /**
      * Desired state of the condition (only for check-line)

@@ -54,6 +54,21 @@ const checkPageBreak = (ctx: RenderContext, neededHeight: number): boolean => {
 const estimateScriptHeight = (script: EmergencyChecklistScript, showHeader: boolean): number => {
     let height = 0;
 
+    const estimateItemHeight = (item: EmergencyChecklistItem): number => {
+        if (item.type === 'INFO') {
+            const titleLines = Math.max(1, Math.ceil(item.title.length / 28));
+            const contentLines = item.content ? Math.ceil(item.content.length / 32) : 0;
+            return (titleLines * 3.5) + (contentLines * 3.2) + 2;
+        }
+
+        if (item.type === 'CONDITION') {
+            const lines = Math.max(1, Math.ceil(item.title.length / 32));
+            return (lines * 3.5) + 1;
+        }
+
+        return 5;
+    };
+
     // Header
     if (showHeader && script.title) {
         height += 6;
@@ -62,9 +77,11 @@ const estimateScriptHeight = (script: EmergencyChecklistScript, showHeader: bool
     // Steps
     script.steps.forEach((step) => {
         if (step.type === 'ITEM' && step.item) {
-            height += step.item.type === 'SUBTITLE' ? 5 : 5;
+            height += estimateItemHeight(step.item);
         } else if (step.type === 'GROUP' && step.group) {
-            height += 5 + (step.group.items.length * 5) + 1;
+            const groupTitleHeight = step.group.title ? 5 : 0;
+            const groupItemsHeight = step.group.items.reduce((sum, item) => sum + estimateItemHeight(item), 0);
+            height += groupTitleHeight + groupItemsHeight + 2;
         }
     });
 
@@ -442,6 +459,34 @@ const drawItem = (
             ctx.currentY += 3.5;
         });
         doc.setTextColor(40);
+        return ctx.currentY;
+    }
+
+    if (item.type === 'INFO') {
+        // Info - small note block (title + optional content)
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(6);
+        doc.setTextColor(80);
+        const titleLines = doc.splitTextToSize(item.title, availableWidth);
+        titleLines.forEach((line: string) => {
+            doc.text(line, startX, ctx.currentY + 3);
+            ctx.currentY += 3.5;
+        });
+
+        const infoContent = item.content || '';
+        if (infoContent.trim()) {
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(6);
+            doc.setTextColor(100);
+            const contentLines = doc.splitTextToSize(infoContent, availableWidth);
+            contentLines.forEach((line: string) => {
+                doc.text(line, startX, ctx.currentY + 3);
+                ctx.currentY += 3.2;
+            });
+        }
+
+        doc.setTextColor(40);
+        ctx.currentY += 1;
         return ctx.currentY;
     }
 

@@ -31,14 +31,31 @@ const renderRichText = (text: string) => {
     // Split by **bold** patterns and preserve the delimiters
     const parts = text.split(/(\*\*.*?\*\*)/g);
 
-    return parts.map((part, index) => {
+    const nodes: React.ReactNode[] = [];
+    let key = 0;
+
+    for (const part of parts) {
         if (part.startsWith('**') && part.endsWith('**')) {
-            // Remove the ** and render as bold
             const boldText = part.slice(2, -2);
-            return <strong key={index}>{boldText}</strong>;
+            const boldLines = boldText.split(/\r?\n/);
+
+            for (let i = 0; i < boldLines.length; i++) {
+                const line = boldLines[i];
+                if (line) nodes.push(<strong key={key++}>{line}</strong>);
+                if (i < boldLines.length - 1) nodes.push(<br key={key++} />);
+            }
+        } else {
+            const regularLines = part.split(/\r?\n/);
+
+            for (let i = 0; i < regularLines.length; i++) {
+                const line = regularLines[i];
+                if (line) nodes.push(<span key={key++}>{line}</span>);
+                if (i < regularLines.length - 1) nodes.push(<br key={key++} />);
+            }
         }
-        return <span key={index}>{part}</span>;
-    });
+    }
+
+    return nodes;
 };
 
 const INITIAL_DATA: AircraftData = {

@@ -15,38 +15,63 @@ const renderRichText = (doc: jsPDF, text: string, x: number, y: number, maxWidth
     let currentX = x;
     let currentY = y;
 
+    const addNewLine = () => {
+        currentX = x;
+        currentY += lineHeight;
+    };
+
     for (const part of parts) {
         if (part.startsWith('**') && part.endsWith('**')) {
             // Bold text
             const boldText = part.slice(2, -2);
-            doc.setFont('helvetica', 'bold');
+            const boldLines = boldText.split(/\r?\n/);
 
-            // Check if this text fits on the current line
-            const textWidth = doc.getTextWidth(boldText);
-            if (currentX + textWidth > x + maxWidth) {
-                currentX = x;
-                currentY += lineHeight;
-            }
+            for (let i = 0; i < boldLines.length; i++) {
+                const boldLine = boldLines[i];
+                doc.setFont('helvetica', 'bold');
 
-            doc.text(boldText, currentX, currentY);
-            currentX += textWidth;
-        } else if (part.trim()) {
-            // Regular text
-            doc.setFont('helvetica', 'normal');
+                if (boldLine) {
+                    // Check if this text fits on the current line
+                    const textWidth = doc.getTextWidth(boldLine);
+                    if (currentX + textWidth > x + maxWidth) {
+                        addNewLine();
+                    }
 
-            // Split regular text into words to handle wrapping
-            const words = part.split(' ');
-            for (const word of words) {
-                const wordWithSpace = word + (word === words[words.length - 1] ? '' : ' ');
-                const textWidth = doc.getTextWidth(wordWithSpace);
-
-                if (currentX + textWidth > x + maxWidth) {
-                    currentX = x;
-                    currentY += lineHeight;
+                    doc.text(boldLine, currentX, currentY);
+                    currentX += textWidth;
                 }
 
-                doc.text(wordWithSpace, currentX, currentY);
-                currentX += textWidth;
+                if (i < boldLines.length - 1) {
+                    addNewLine();
+                }
+            }
+        } else {
+            // Regular text
+            const regularLines = part.split(/\r?\n/);
+
+            for (let i = 0; i < regularLines.length; i++) {
+                const regularLine = regularLines[i];
+                doc.setFont('helvetica', 'normal');
+
+                if (regularLine.trim()) {
+                    // Split regular text into words to handle wrapping
+                    const words = regularLine.split(' ');
+                    for (const word of words) {
+                        const wordWithSpace = word + (word === words[words.length - 1] ? '' : ' ');
+                        const textWidth = doc.getTextWidth(wordWithSpace);
+
+                        if (currentX + textWidth > x + maxWidth) {
+                            addNewLine();
+                        }
+
+                        doc.text(wordWithSpace, currentX, currentY);
+                        currentX += textWidth;
+                    }
+                }
+
+                if (i < regularLines.length - 1) {
+                    addNewLine();
+                }
             }
         }
     }
@@ -129,7 +154,7 @@ export const generateSpeedsBriefingPDF = (data: AircraftData, mode: 'individual'
                 doc.setFont('helvetica', 'normal');
                 doc.setFontSize(isCombo ? 7 : 7.5);
                 const content = section.content || section.steps || ''; // Fallback for backward compatibility
-                y = renderRichText(doc, content, xOffset + 6, y, STRIP_WIDTH - 10, isCombo ? 7 : 7.5);
+                y = renderRichText(doc, content, xOffset + 6, y, STRIP_WIDTH - 10, isCombo ? 8 : 8.5);
                 y += (isCombo ? 3 : 5);
             });
         }

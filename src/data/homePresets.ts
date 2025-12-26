@@ -88,19 +88,20 @@ export const C172N_DATA = {
     aircraftModel: "CESSNA 172N SKYHAWK",
     footer: "",
     speeds: [
-        { label: "Max Speed in Rough Air V_NO", value: "128 Kts" },
-        { label: "Max Maneuvering Speed V_A (2300 lbs)", value: "97 Kts" },
-        { label: "Max Speed Flaps 10° V_FE", value: "85 Kts" },
-        { label: "Max Speed Flaps FULL V_FE", value: "85 Kts" },
-        { label: "Never Exceed Speed V_NE", value: "160 Kts" },
-        { label: "Stall Speed Clean V_S1", value: "47 Kts" },
-        { label: "Stall Speed Flaps FULL V_SO", value: "41 Kts" }
+        { label: "V_R - Rotate Speed", value: "55 Kts" },
+        { label: "V_Y - Best Rate of Climb", value: "75 Kts" },
+        { label: "V_X - Best Angle of Climb", value: "60 Kts" },
+        { label: "V_A - Max Maneuvering Speed", value: "80-95 Kts" },
+        { label: "V_FE - Max Flap Ext", value: "85 Kts" },
+        { label: "V_NO - Mac Cruise", value: "128 Kts" },
+        { label: "V_NE - Never Exceed Speed", value: "160 Kts" },
+        { label: "V_S - Stall Speed Clean", value: "53 Kts" },
+        { label: "V_SO - Stall Speed Flaps FULL", value: "48 Kts" }
     ],
     takeoff: [
-        { label: "Rotation Speed V_R", value: "55 Kts" },
-        { label: "Best Rate of Climb V_Y", value: "73 Kts" },
-        { label: "Best Angle of Climb V_X", value: "59 Kts" },
-        { label: "Short Field Obstacle Clear", value: "59 Kts" }
+        { label: "V_R - Rotation Speed", value: "55 Kts" },
+        { label: "V_Y - Best Rate of Climb", value: "75 Kts" },
+        { label: "V_X - Best Angle of Climb", value: "60 Kts" },
     ],
     landing: [
         { label: "Normal Approach (Flaps Up)", value: "60-70 Kts" },
@@ -114,14 +115,20 @@ export const C172N_DATA = {
         { label: "Distance per 1000ft AGL", value: "1.5 NM" }
     ],
     briefing: [
-        { title: "SAFETY BRIEFING", content: "**S** - Seatbelts fastened **A** - Air vents overhead/panel. **F** - Fire extinguisher between seats. **E** - Doors and luggage door. **T** - No talking during takeoff/landing. Point out traffic. **Y** - Any questions?" },
+        { title: "SAFETY BRIEFING", content: "**S** - Seatbelts fastened \n**A** - Air vents overhead/panel. \n**F** - Fire extinguisher between seats. \n**E** - Doors and luggage door. \n**T** - No talking during takeoff/landing. Point out traffic. \n**Y** - Any questions?" },
 
         // Takeoff Briefing
-        { type: "Takeoff", title: "Type of Takeoff", content: "Normal takeoff, flaps up. Rotation at 55 knots, climb out at 73 knots." },
-        { type: "Takeoff", title: "Runway", content: "Departing Runway [Insert Runway]. Full length available." },
-        { type: "Takeoff", title: "Abnormal on Runway", content: "If any abnormality occurs before rotation, I will close the throttle and stop straight ahead." },
-        { type: "Takeoff", title: "Engine Failure < 1000' AGL", content: "If engine fails after rotation with runway remaining, I will land on the runway. If runway is insufficient and below 1000', I will pick a field 30° left or right of nose. No turns back." },
-        { type: "Takeoff", title: "Engine Failure > 1000' AGL", content: "If above 1000', I will check if a return to the airport is possible or select the best field." }
+        { title: "Type of Takeoff", content: "Normal takeoff, flaps up. Rotation at 55 knots, climb out at 75 knots." },
+        { title: "Runway", content: "Departing Runway [RW]. Full length available." },
+        { title: "Abnormal on Runway", content: "If any abnormality occurs before rotation, I will close the throttle and stop straight ahead." },
+        { title: "Engine Failure < 1000' AGL", content: "If engine fails after rotation with runway remaining, I will land on the runway. If runway is insufficient and below 1000', I will pick a field 30° left or right of nose. No turns back." },
+        { title: "Engine Failure > 1000' AGL", content: "If above 1000', I will check if a return to the airport is possible or select the best field." },
+
+        { title: "Short Field Takeoff", content: "Flaps UP. I will hold the brakes, apply full power, and check gauges. Release brakes, rotate at 55 knots. Climb at 59 knots until clear of the obstacle, then accelerate to 73 knots." },
+        { title: "Soft Field Takeoff", content: "Flaps 10°. I will keep the nose wheel light and lift off as soon as possible. I will stay in ground effect to accelerate to 55 knots, then climb out gently." },
+        { title: "Normal Landing", content: "Flaps 40°. Final approach at 65 knots. Aiming for the numbers." },
+        { title: "Short Field Landing", content: "Flaps 40°. Steep approach at 60 knots. I will cut power over the obstacles, touch down on the aiming point, retract flaps immediately, and apply heavy braking." },
+        { title: "Soft Field Landing", content: "Flaps 40°. I will carry a small amount of power to cushion the landing. I will hold the nose wheel off the ground as long as possible and use minimum braking." },
     ]
 };
 
@@ -191,19 +198,16 @@ export const C172N_EMERGENCY_DATA = {
             scripts: [
                 {
                     title: "ENGINE FAILURE DURING T/O RUN",
-                    internalCode: "EMERGENCY 3-3",
                     steps: [
                         { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Throttle", desiredState: "IDLE" } },
                         { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Brakes", desiredState: "APPLY" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Wing Flaps", desiredState: "RETRACT" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Flaps", desiredState: "RETRACT" } },
                         { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Mixture", desiredState: "IDLE CUT-OFF" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Ignition Switch", desiredState: "OFF" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Master Switch", desiredState: "OFF" } }
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Ignition", desiredState: "OFF" } },
                     ]
                 },
                 {
                     title: "ENGINE FAILURE IMMEDIATELY AFTER T/O",
-                    internalCode: "EMERGENCY 3-3",
                     steps: [
                         { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Airspeed", desiredState: "65 KIAS (Flaps UP)" } },
                         { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Airspeed", desiredState: "60 KIAS (Flaps DOWN)" } },
@@ -211,18 +215,18 @@ export const C172N_EMERGENCY_DATA = {
                         { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Fuel Selector", desiredState: "OFF" } },
                         { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Ignition Switch", desiredState: "OFF" } },
                         { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Wing Flaps", desiredState: "AS REQUIRED" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Master Switch", desiredState: "OFF" } }
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Master Switch", desiredState: "OFF" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Emergency Landing", desiredState: "EXECUTE" } },
                     ]
                 },
                 {
                     title: "ENGINE FAILURE DURING FLIGHT",
-                    internalCode: "EMERGENCY 3-3",
                     steps: [
                         { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Airspeed", desiredState: "65 KIAS" } },
                         { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Carburetor Heat", desiredState: "ON" } },
                         { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Fuel Selector", desiredState: "BOTH" } },
                         { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Mixture", desiredState: "RICH" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Ignition Switch", desiredState: "BOTH (or START)" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Ignition", desiredState: "BOTH (or START)" } },
                         { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Primer", desiredState: "IN and LOCKED" } }
                     ]
                 }
@@ -233,19 +237,100 @@ export const C172N_EMERGENCY_DATA = {
             title: "FORCED LANDINGS",
             scripts: [
                 {
-                    title: "EMERGENCY LANDING WITHOUT ENGINE POWER",
-                    internalCode: "EMERGENCY 3-4",
+                    title: "EMERGENCY LANDING W/ ENGINE POWER",
                     steps: [
                         { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Airspeed", desiredState: "65 KIAS (Flaps UP)" } },
                         { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Airspeed", desiredState: "60 KIAS (Flaps DOWN)" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Landing Site", desiredState: "IDENTIFY" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Radio", desiredState: "MAYDAY-121.5" } },
                         { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Mixture", desiredState: "IDLE CUT-OFF" } },
                         { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Fuel Selector", desiredState: "OFF" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Ignition Switch", desiredState: "OFF" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Wing Flaps", desiredState: "AS REQUIRED" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Master Switch", desiredState: "OFF" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Ignition", desiredState: "OFF" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Flaps", desiredState: "AS REQUIRED" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Master", desiredState: "OFF" } },
                         { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Doors", desiredState: "UNLATCH" } },
                         { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Touchdown", desiredState: "SLIGHTLY TAIL LOW" } },
                         { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Brakes", desiredState: "APPLY HEAVILY" } }
+                    ]
+                },
+                {
+                    title: "EMERGENCY LANDING W/O ENGINE POWER",
+                    steps: [
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Flaps", desiredState: "AS REQUIRED" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Airspeed", desiredState: "60 KIAS" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Landing Site", desiredState: "IDENTIFY" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Radio", desiredState: "MAYDAY-121.5" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Avionics", desiredState: "OFF" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Master", desiredState: "OFF" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Doors", desiredState: "UNLATCH" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Touchdown", desiredState: "SLIGHTLY TAIL LOW" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Ignition", desiredState: "OFF" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Brakes", desiredState: "APPLY HEAVILY" } }
+                    ]
+                }
+            ]
+        },
+        {
+            type: 'EMERGENCY',
+            title: "FIRES",
+            scripts: [
+                {
+                    title: "DURING START ON GROUND",
+                    steps: [
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Cranking", desiredState: "CONTINUE" } },
+                        { type: 'ITEM', item: { type: 'INFO', title: "IF ENGINE STARTS:", content: "Power 1700 RPM for a few minutes, then Shutdown." } },
+                        { type: 'ITEM', item: { type: 'INFO', title: "IF ENGINE FAILS TO START:", content: "Throttle - Full" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Mixture", desiredState: "IDLE CUT-OFF" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Cranking", desiredState: "CONTINUE" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Fuel Selector", desiredState: "OFF" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Master", desiredState: "OFF" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Ignition", desiredState: "OFF" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Fire Extinguisher", desiredState: "APPLY" } }
+                    ]
+                },
+                {
+                    title: "ELECTRICAL FIRE IN FLIGHT",
+                    steps: [
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Master", desiredState: "OFF" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Avionics", desiredState: "OFF" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "All Other Switches", desiredState: "OFF" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Vents", desiredState: "CLOSED" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Fire Extinguisher", desiredState: "APPLY" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Vents", desiredState: "OPEN WHEN FIRE OUT" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Master", desiredState: "ON" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Circuit Breakers", desiredState: "CHECK, NO RESET" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Avionics", desiredState: "ON INCREMENTALLY" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Vents", desiredState: "OPEN" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Land the Airplane", desiredState: "ASAP" } }
+                    ]
+                },
+                {
+                    title: "ENGINE FIRE IN FLIGHT",
+                    steps: [
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Mixture", desiredState: "IDLE CUT-OFF" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Fuel Selector", desiredState: "OFF" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Master", desiredState: "OFF" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Cabin Heat and Air", desiredState: "OFF" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Airspeed", desiredState: "100 KIAS" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Forced Landing", desiredState: "EXECUTE" } }
+                    ]
+                },
+                {
+                    title: "CABIN FIRE",
+                    steps: [
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Master", desiredState: "OFF" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Vents", desiredState: "CLOSED" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Fire Extinguisher", desiredState: "ACTIVATE" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Land the Airplane", desiredState: "ASAP" } }
+                    ]
+                },
+                {
+                    title: "WING FIRE",
+                    steps: [
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Navigation Lights", desiredState: "OFF" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Strobe Lights", desiredState: "OFF" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Side Slip", desiredState: "AWAY FROM FLAMES" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Land the Airplane", desiredState: "ASAP" } }
                     ]
                 }
             ]
@@ -256,7 +341,6 @@ export const C172N_EMERGENCY_DATA = {
             scripts: [
                 {
                     title: "PROCEDURE",
-                    internalCode: "EMERGENCY 4-5",
                     steps: [
                         { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Throttle", desiredState: "IDLE" } },
                         { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Ailerons", desiredState: "NEUTRAL" } },
@@ -269,73 +353,21 @@ export const C172N_EMERGENCY_DATA = {
         },
         {
             type: 'EMERGENCY',
-            title: "FIRES",
+            title: "DITCHING",
             scripts: [
                 {
-                    title: "DURING START ON GROUND",
-                    internalCode: "EMERGENCY 3-5",
+                    title: "PROCEDURE",
                     steps: [
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Cranking", desiredState: "CONTINUE" } },
-                        { type: 'ITEM', item: { type: 'INFO', title: "IF ENGINE STARTS:", content: "Power 1700 RPM for a few minutes, then Shutdown." } },
-                        { type: 'ITEM', item: { type: 'INFO', title: "IF ENGINE FAILS TO START:", content: "" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Throttle", desiredState: "FULL OPEN" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Mixture", desiredState: "IDLE CUT-OFF" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Cranking", desiredState: "CONTINUE" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Fire Extinguisher", desiredState: "OBTAIN" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Engine", desiredState: "SECURE" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Master Switch", desiredState: "OFF" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Ignition Switch", desiredState: "OFF" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Fuel Selector", desiredState: "OFF" } }
-                    ]
-                },
-                {
-                    title: "ENGINE FIRE IN FLIGHT",
-                    internalCode: "EMERGENCY 3-6",
-                    steps: [
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Mixture", desiredState: "IDLE CUT-OFF" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Fuel Selector", desiredState: "OFF" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Master Switch", desiredState: "OFF" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Cabin Heat and Air", desiredState: "OFF" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Airspeed", desiredState: "100 KIAS" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Forced Landing", desiredState: "EXECUTE" } }
-                    ]
-                },
-                {
-                    title: "ELECTRICAL FIRE IN FLIGHT",
-                    internalCode: "EMERGENCY 3-6",
-                    steps: [
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Master Switch", desiredState: "OFF" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Avionics Power", desiredState: "OFF" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "All Other Switches", desiredState: "OFF" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Vents/Cabin Air/Heat", desiredState: "CLOSED" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Fire Extinguisher", desiredState: "ACTIVATE" } },
-                        { type: 'ITEM', item: { type: 'INFO', title: "WARNING", content: "Ventilate cabin after discharging extinguisher." } }
-                    ]
-                },
-                {
-                    title: "CABIN FIRE",
-                    internalCode: "EMERGENCY 3-6",
-                    steps: [
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Master Switch", desiredState: "OFF" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Vents/Cabin Air/Heat", desiredState: "CLOSED" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Fire Extinguisher", desiredState: "ACTIVATE" } },
-                        { type: 'ITEM', item: { type: 'INFO', title: "WARNING", content: "Ventilate cabin after discharging extinguisher." } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Land the Airplane", desiredState: "AS SOON AS POSSIBLE" } }
-                    ]
-                },
-                {
-                    title: "WING FIRE",
-                    internalCode: "EMERGENCY 3-7",
-                    steps: [
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Navigation Lights", desiredState: "OFF" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Strobe Lights", desiredState: "OFF" } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Pitot Heat", desiredState: "OFF" } },
-                        { type: 'ITEM', item: { type: 'INFO', title: "NOTE", content: "Perform a sideslip to keep the flames away from the fuel tank and cabin." } },
-                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Land the Airplane", desiredState: "AS SOON AS POSSIBLE" } }
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Radio", desiredState: "MAYDAY-121.5" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Heavy Objects", desiredState: "JETTISON" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Flaps", desiredState: "FULL" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Power", desiredState: "65 KTS" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Approach", desiredState: "INTO THE WIND" } },
+                        { type: 'ITEM', item: { type: 'CHECK_LINE', title: "Doors", desiredState: "UNLATCHED" } }
                     ]
                 }
             ]
-        }
+        },
     ],
     footer: "DATA DERIVED FROM 1977 CESSNA 172N POH SECTION 3."
 };
