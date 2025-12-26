@@ -1,28 +1,55 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { SPEEDS_PRESETS, WEIGHT_BALANCE_PRESETS, EMERGENCY_PRESETS } from '../data/homePresets';
 
-export function useGeneratorData<T extends Record<string, unknown>>(storageKey: string, initialData: T) {
+export function useGeneratorData<T extends Record<string, unknown>>(storageKey: string, initialData: T, presetType?: 'speeds' | 'weight-balance' | 'emergency') {
     const [data, setData] = useState<T>(initialData);
     const [importError, setImportError] = useState("");
     const [copySuccess, setCopySuccess] = useState(false);
+    const [hasUserChanges, setHasUserChanges] = useState(false);
     const location = useLocation();
 
     useEffect(() => {
-        // Check for URL parameter first
+        // Check for preset parameter first
         const urlParams = new URLSearchParams(location.search);
+        const preset = urlParams.get('preset');
         const urlData = urlParams.get('data');
 
         if (urlData) {
+            // Handle legacy Base64 data loading
             try {
                 const decoded = decodeURIComponent(escape(atob(urlData)));
                 const parsed = JSON.parse(decoded);
                 // eslint-disable-next-line react-hooks/set-state-in-effect
                 setData(parsed as T);
+                setHasUserChanges(true);
                 // Clear the URL parameter after loading
                 window.history.replaceState({}, '', location.pathname);
                 return;
             } catch {
                 console.error("Failed to load data from URL");
+                window.history.replaceState({}, '', location.pathname);
+            }
+        } else if (preset && !hasUserChanges) {
+            // Handle preset loading
+            try {
+                let presetData;
+                if (presetType === 'speeds') {
+                    presetData = SPEEDS_PRESETS[preset as keyof typeof SPEEDS_PRESETS];
+                } else if (presetType === 'weight-balance') {
+                    presetData = WEIGHT_BALANCE_PRESETS[preset as keyof typeof WEIGHT_BALANCE_PRESETS];
+                } else if (presetType === 'emergency') {
+                    presetData = EMERGENCY_PRESETS[preset as keyof typeof EMERGENCY_PRESETS];
+                }
+
+                if (presetData) {
+                    // eslint-disable-next-line react-hooks/set-state-in-effect
+                    setData(presetData as unknown as T);
+                    setHasUserChanges(false);
+                    return;
+                }
+            } catch (error) {
+                console.error("Failed to load preset", preset, error);
             }
         }
 
@@ -32,15 +59,23 @@ export function useGeneratorData<T extends Record<string, unknown>>(storageKey: 
             try {
                 // eslint-disable-next-line react-hooks/set-state-in-effect
                 setData(JSON.parse(saved));
+                setHasUserChanges(true);
             } catch {
                 console.error("Failed to load saved data for", storageKey);
             }
         }
-    }, [storageKey, location.search]);
+    }, [storageKey, location.search, presetType, hasUserChanges]);
 
     const saveToLocal = (newData: T) => {
         setData(newData);
         localStorage.setItem(storageKey, JSON.stringify(newData));
+        setHasUserChanges(true);
+
+        // Clear preset parameter if user has made changes
+        const urlParams = new URLSearchParams(location.search);
+        if (urlParams.get('preset')) {
+            window.history.replaceState({}, '', location.pathname);
+        }
     };
 
     const updateField = (category: keyof T, index: number | null, key: string, value: unknown) => {
@@ -117,6 +152,25 @@ export function useGeneratorData<T extends Record<string, unknown>>(storageKey: 
 
     const getShareableUrl = () => {
         try {
+            // Check if current data matches any preset (only if no user changes)
+            if (!hasUserChanges && presetType) {
+                let presets;
+                if (presetType === 'speeds') {
+                    presets = SPEEDS_PRESETS;
+                } else if (presetType === 'weight-balance') {
+                    presets = WEIGHT_BALANCE_PRESETS;
+                } else if (presetType === 'emergency') {
+                    presets = EMERGENCY_PRESETS;
+                }
+
+                for (const [presetKey, presetData] of Object.entries(presets || {})) {
+                    if (JSON.stringify(data) === JSON.stringify(presetData)) {
+                        return `${window.location.origin}${window.location.pathname}?preset=${presetKey}`;
+                    }
+                }
+            }
+
+            // Fall back to Base64 encoding for custom data
             const json = JSON.stringify(data);
             const base64 = btoa(unescape(encodeURIComponent(json)));
             const url = `${window.location.origin}${window.location.pathname}?data=${base64}`;

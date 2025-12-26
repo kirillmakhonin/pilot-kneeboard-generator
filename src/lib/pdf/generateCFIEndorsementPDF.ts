@@ -145,7 +145,7 @@ export const generateCFIEndorsementPDF = (
         pdf.setDrawColor(0);
         pdf.line(startX, cursorY, startX + contentW, cursorY);
 
-        cursorY += 2.5;
+        cursorY += 3.5;
 
         // Body
         pdf.setTextColor(0);

@@ -4,8 +4,10 @@ export interface SpeedData {
 }
 
 export interface BriefingData {
+    type?: string; // New field for briefing type (e.g., "Passenger", "Takeoff")
     title: string;
-    steps: string;
+    content?: string; // New field for content
+    steps?: string; // Legacy field for backward compatibility
 }
 
 export interface AircraftData {
@@ -35,6 +37,64 @@ export interface WeightBalanceData {
     maxTakeoffWeight: string;
     referenceDatum: string;
     positions: WeightBalancePosition[];
+    footer: string;
+    [key: string]: unknown;
+}
+
+export interface FlightPlanAirport {
+    code: string;
+    elevation: string;
+    wxFreq: string;
+    approachFreq: string;
+    towerFreq: string;
+    groundFreq: string;
+    ctafFreq: string;
+    fssFreq: string;
+    unicomFreq: string;
+}
+
+export interface FlightPlanClimb {
+    cruiseAlt: string;
+    fieldElev: string;
+    climbFpm: string;
+    climbGph: string;
+}
+
+export interface FlightPlanCruise {
+    powerPercent: string;
+    manifoldPressure: string;
+    rpm: string;
+    gph: string;
+    tas: string;
+}
+
+export interface FlightPlanDescent {
+    descentRate: string;
+}
+
+export interface FlightPlanLeg {
+    name: string;
+    vorFreq?: string;
+    altitude: string;
+    windDirection: string;
+    windVelocity: string;
+    temperature: string;
+    tas: string;
+    trueCourse: string;
+    magneticHeading: string;
+    heading: string;
+    groundSpeed: string;
+    distance: string;
+    ete: string;
+}
+
+export interface FlightPlanData {
+    departure: FlightPlanAirport;
+    arrival: FlightPlanAirport;
+    climb: FlightPlanClimb;
+    cruise: FlightPlanCruise;
+    descent: FlightPlanDescent;
+    legs: FlightPlanLeg[];
     footer: string;
     [key: string]: unknown;
 }

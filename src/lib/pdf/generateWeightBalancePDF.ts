@@ -195,10 +195,10 @@ export const generateWeightBalancePDF = (data: WeightBalanceData) => {
 
         // Prepare table data with portrait-optimized columns
         const headers = ['POSITION', 'WEIGHT', 'ARM', 'MOMENT'];
-        const columnWidths = [50, 25, 25, 30]; // Optimized for 5.5" width
+        const columnWidths = [65, 18, 18, 22]; // Increased position column width significantly
 
         const rows = data.positions.map(position => [
-            position.name.length > 15 ? position.name.substring(0, 15) + '...' : position.name,
+            position.name.length > 25 ? position.name.substring(0, 25) + '...' : position.name,
             position.weight,
             position.arm,
             position.moment

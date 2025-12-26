@@ -2,6 +2,58 @@ import jsPDF from 'jspdf';
 import type { AircraftData } from '../../types';
 import { drawPageBorder, addFooter, addSectionHeader, addRowWithDots, drawCutMarks } from './pdfUtils';
 
+// Rich text rendering function for **bold** text in PDF
+const renderRichText = (doc: jsPDF, text: string, x: number, y: number, maxWidth: number, fontSize: number) => {
+    if (!text) return y;
+
+    doc.setFontSize(fontSize);
+    const lineHeight = fontSize * 0.3527 * 1.2; // pt -> mm
+
+    // Split text by **bold** patterns
+    const parts = text.split(/(\*\*.*?\*\*)/g);
+
+    let currentX = x;
+    let currentY = y;
+
+    for (const part of parts) {
+        if (part.startsWith('**') && part.endsWith('**')) {
+            // Bold text
+            const boldText = part.slice(2, -2);
+            doc.setFont('helvetica', 'bold');
+
+            // Check if this text fits on the current line
+            const textWidth = doc.getTextWidth(boldText);
+            if (currentX + textWidth > x + maxWidth) {
+                currentX = x;
+                currentY += lineHeight;
+            }
+
+            doc.text(boldText, currentX, currentY);
+            currentX += textWidth;
+        } else if (part.trim()) {
+            // Regular text
+            doc.setFont('helvetica', 'normal');
+
+            // Split regular text into words to handle wrapping
+            const words = part.split(' ');
+            for (const word of words) {
+                const wordWithSpace = word + (word === words[words.length - 1] ? '' : ' ');
+                const textWidth = doc.getTextWidth(wordWithSpace);
+
+                if (currentX + textWidth > x + maxWidth) {
+                    currentX = x;
+                    currentY += lineHeight;
+                }
+
+                doc.text(wordWithSpace, currentX, currentY);
+                currentX += textWidth;
+            }
+        }
+    }
+
+    return currentY + lineHeight;
+};
+
 export const generateSpeedsBriefingPDF = (data: AircraftData, mode: 'individual' | 'combo' = 'individual') => {
     // US Letter dimensions in mm
     const LETTER_WIDTH_LANDSCAPE = 279.4;
@@ -55,6 +107,16 @@ export const generateSpeedsBriefingPDF = (data: AircraftData, mode: 'individual'
         y = addSectionHeader(doc, "PRE-TAKEOFF BRIEFING", y, xOffset, STRIP_WIDTH, mode);
         if (data.briefing) {
             data.briefing.forEach(section => {
+                // Show type if present
+                if (section.type) {
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(isCombo ? 6 : 6.5);
+                    doc.setTextColor(0, 0, 139); // Blue color for type
+                    doc.text(section.type.toUpperCase(), xOffset + 6, y);
+                    y += 3.5;
+                    doc.setTextColor(0); // Reset to black
+                }
+
                 doc.setFont('helvetica', 'bold');
                 doc.setFontSize(isCombo ? 7 : 7.5);
                 const titleLines = doc.splitTextToSize(section.title.toUpperCase(), STRIP_WIDTH - 10);
@@ -66,11 +128,8 @@ export const generateSpeedsBriefingPDF = (data: AircraftData, mode: 'individual'
                 y += 1;
                 doc.setFont('helvetica', 'normal');
                 doc.setFontSize(isCombo ? 7 : 7.5);
-                const stepLines = doc.splitTextToSize(section.steps, STRIP_WIDTH - 10);
-                stepLines.forEach((line: string) => {
-                    doc.text(line, xOffset + 6, y);
-                    y += 3.2;
-                });
+                const content = section.content || section.steps || ''; // Fallback for backward compatibility
+                y = renderRichText(doc, content, xOffset + 6, y, STRIP_WIDTH - 10, isCombo ? 7 : 7.5);
                 y += (isCombo ? 3 : 5);
             });
         }

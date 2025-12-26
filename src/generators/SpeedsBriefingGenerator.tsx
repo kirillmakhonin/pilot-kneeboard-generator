@@ -24,6 +24,23 @@ import { generateSpeedsBriefingPDF } from '../lib/pdf/generatePDF';
 import { useGeneratorData } from '../hooks/useGeneratorData';
 import type { AircraftData } from '../types';
 
+// Rich text rendering function for **bold** text
+const renderRichText = (text: string) => {
+    if (!text) return text;
+
+    // Split by **bold** patterns and preserve the delimiters
+    const parts = text.split(/(\*\*.*?\*\*)/g);
+
+    return parts.map((part, index) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+            // Remove the ** and render as bold
+            const boldText = part.slice(2, -2);
+            return <strong key={index}>{boldText}</strong>;
+        }
+        return <span key={index}>{part}</span>;
+    });
+};
+
 const INITIAL_DATA: AircraftData = {
     aircraftModel: "DIAMOND DA20-C1",
     footer: "FLIGHT SCHOOL",
@@ -115,7 +132,7 @@ export const SpeedsBriefingGenerator: React.FC = () => {
         copySuccess,
         getShareableUrl,
         copyShareableUrl
-    } = useGeneratorData<AircraftData>('pilot_checklist_data_v6', INITIAL_DATA);
+    } = useGeneratorData<AircraftData>('pilot_checklist_data_v6', INITIAL_DATA, 'speeds');
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -217,7 +234,7 @@ export const SpeedsBriefingGenerator: React.FC = () => {
                                 <h3 className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Edit {activeTab} Section</h3>
                                 <button
                                     onClick={() => addItem(activeTab, activeTab === 'briefing'
-                                        ? { title: "New Section Title", steps: "" }
+                                        ? { type: "Passenger", title: "New Section Title", content: "" }
                                         : { label: "New Item V_X", value: "" })}
                                     className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-blue-600 hover:text-blue-700"
                                 >
@@ -225,22 +242,32 @@ export const SpeedsBriefingGenerator: React.FC = () => {
                                 </button>
                             </div>
                             <div className="space-y-2">
-                                {(data[activeTab] as Array<{ label?: string; title?: string; value?: string; steps?: string }>)?.map((item, idx) => (
+                                {(data[activeTab] as Array<{ label?: string; title?: string; value?: string; steps?: string; type?: string; content?: string }>)?.map((item, idx) => (
                                     <div key={idx} className="flex gap-3 items-start bg-slate-50/50 p-3 rounded-lg border border-slate-100 group">
                                         <div className="flex-1 space-y-2">
+                                            {activeTab === 'briefing' && (
+                                                <select
+                                                    value={item.type || 'Passenger'}
+                                                    onChange={(e) => updateField(activeTab, idx, 'type', e.target.value)}
+                                                    className="w-full text-xs font-bold text-blue-600 bg-transparent border-none p-0 focus:ring-0 mb-2"
+                                                >
+                                                    <option value="Passenger">Passenger</option>
+                                                    <option value="Takeoff">Takeoff</option>
+                                                </select>
+                                            )}
                                             <div className="flex items-center gap-2">
                                                 <input
                                                     type="text"
                                                     value={item.label || item.title || ''}
                                                     onChange={(e) => updateField(activeTab, idx, item.label !== undefined ? 'label' : 'title', e.target.value)}
-                                                    placeholder="Label (use _ for subscript)"
+                                                    placeholder={activeTab === 'briefing' ? "Briefing Title" : "Label (use _ for subscript)"}
                                                     className="w-full text-xs font-black uppercase text-slate-500 bg-transparent border-none p-0 focus:ring-0"
                                                 />
                                             </div>
                                             <textarea
-                                                value={item.value || item.steps || ''}
-                                                onChange={(e) => updateField(activeTab, idx, item.value !== undefined ? 'value' : 'steps', e.target.value)}
-                                                placeholder="Content"
+                                                value={item.value || item.steps || item.content || ''}
+                                                onChange={(e) => updateField(activeTab, idx, item.value !== undefined ? 'value' : (item.steps !== undefined ? 'steps' : 'content'), e.target.value)}
+                                                placeholder={activeTab === 'briefing' ? "Briefing Content" : "Content"}
                                                 rows={activeTab === 'briefing' ? 3 : 1}
                                                 className="w-full text-sm font-medium text-slate-800 bg-transparent border-none p-0 focus:ring-0 resize-none"
                                             />
@@ -343,8 +370,11 @@ export const SpeedsBriefingGenerator: React.FC = () => {
                         <div className="space-y-5 px-1 z-10">
                             {data.briefing?.map((item, i) => (
                                 <div key={i} className="space-y-1">
+                                    {item.type && (
+                                        <div className="text-[9px] font-bold text-blue-600 uppercase tracking-wider mb-2">{item.type}</div>
+                                    )}
                                     <div className="text-[10px] font-black leading-tight uppercase text-center border-b border-slate-50 pb-0.5">{item.title}</div>
-                                    <div className="text-[10px] text-slate-800 leading-[1.5] text-left">{item.steps}</div>
+                                    <div className="text-[10px] text-slate-800 leading-[1.5] text-left">{renderRichText(item.content || item.steps || '')}</div>
                                 </div>
                             ))}
                         </div>

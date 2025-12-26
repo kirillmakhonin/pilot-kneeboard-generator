@@ -4,6 +4,7 @@ import { SpeedsBriefingGenerator } from './generators/SpeedsBriefingGenerator';
 import { WeightAndBalanceGenerator } from './generators/WeightAndBalanceGenerator';
 import { EmergencyChecklistGenerator } from './generators/EmergencyChecklistGenerator';
 import { CFIEndorsementsGenerator } from './generators/CFIEndorsementsGenerator';
+import FlightPlanGenerator from './generators/FlightPlanGenerator';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/weight-balance" element={<WeightAndBalanceGenerator />} />
         <Route path="/emergency" element={<EmergencyChecklistGenerator />} />
         <Route path="/cfi-endorsements" element={<CFIEndorsementsGenerator />} />
+        <Route path="/flight-plan" element={<FlightPlanGenerator />} />
       </Routes>
     </Router>
   );

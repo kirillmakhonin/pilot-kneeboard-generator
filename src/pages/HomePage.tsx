@@ -1,9 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Plane, Calculator, Settings, ChevronRight, Sparkles, FileText } from 'lucide-react';
-import { C172N_DATA, C172N_WB_DATA, C172S_SPEEDS_DATA, C172S_WB_DATA, DA20_SPEEDS_DATA, DA20_WB_DATA } from '../data/homePresets';
-
-const encodeData = (data: unknown) => btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+import { Plane, Calculator, Settings, ChevronRight, Sparkles, FileText, MapPin } from 'lucide-react';
 
 interface GeneratorCardProps {
     title: string;
@@ -50,6 +47,15 @@ const generators: Generator[] = [
         color: 'red',
         status: 'active',
         features: ['Emergency Checklists', 'Quick Reference', 'Critical Procedures']
+    },
+    {
+        id: 'flight-plan',
+        title: 'VFR Flight Plan',
+        description: 'Generate comprehensive VFR flight planning documents with airport information, performance planning, and navigation logs.',
+        icon: MapPin,
+        color: 'purple',
+        status: 'active',
+        features: ['Airport Information', 'Performance Planning', 'Navigation Logs', 'Route Planning']
     },
     {
         id: 'cfi-endorsements',
@@ -189,16 +195,22 @@ export const HomePage: React.FC = () => {
                             </div>
                             <div className="flex flex-wrap gap-2">
                                 <Link
-                                    to={`/speeds-briefing?data=${encodeData(DA20_SPEEDS_DATA)}`}
+                                    to={`/speeds-briefing?preset=da20-c1`}
                                     className="flex-1 text-center px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
                                 >
                                     Speeds & Briefing
                                 </Link>
                                 <Link
-                                    to={`/weight-balance?data=${encodeData(DA20_WB_DATA)}`}
+                                    to={`/weight-balance?preset=da20-c1`}
                                     className="flex-1 text-center px-4 py-2 bg-green-50 hover:bg-green-100 text-green-700 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
                                 >
                                     Weight & Balance
+                                </Link>
+                                <Link
+                                    to={`/emergency?preset=da20-c1`}
+                                    className="flex-1 text-center px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
+                                >
+                                    Emergency
                                 </Link>
                             </div>
                         </div>
@@ -216,16 +228,22 @@ export const HomePage: React.FC = () => {
                             </div>
                             <div className="flex flex-wrap gap-2">
                                 <Link
-                                    to={`/speeds-briefing?data=${encodeData(C172S_SPEEDS_DATA)}`}
+                                    to={`/speeds-briefing?preset=c172s`}
                                     className="flex-1 text-center px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
                                 >
                                     Speeds & Briefing
                                 </Link>
                                 <Link
-                                    to={`/weight-balance?data=${encodeData(C172S_WB_DATA)}`}
+                                    to={`/weight-balance?preset=c172s`}
                                     className="flex-1 text-center px-4 py-2 bg-green-50 hover:bg-green-100 text-green-700 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
                                 >
                                     Weight & Balance
+                                </Link>
+                                <Link
+                                    to={`/emergency?preset=c172s`}
+                                    className="flex-1 text-center px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
+                                >
+                                    Emergency
                                 </Link>
                             </div>
                         </div>
@@ -243,16 +261,22 @@ export const HomePage: React.FC = () => {
                             </div>
                             <div className="flex flex-wrap gap-2">
                                 <Link
-                                    to={`/speeds-briefing?data=${encodeData(C172N_DATA)}`}
+                                    to={`/speeds-briefing?preset=c172n`}
                                     className="flex-1 text-center px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
                                 >
                                     Speeds & Briefing
                                 </Link>
                                 <Link
-                                    to={`/weight-balance?data=${encodeData(C172N_WB_DATA)}`}
+                                    to={`/weight-balance?preset=c172n`}
                                     className="flex-1 text-center px-4 py-2 bg-green-50 hover:bg-green-100 text-green-700 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
                                 >
                                     Weight & Balance
+                                </Link>
+                                <Link
+                                    to={`/emergency?preset=c172n`}
+                                    className="flex-1 text-center px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
+                                >
+                                    Emergency
                                 </Link>
                             </div>
                         </div>

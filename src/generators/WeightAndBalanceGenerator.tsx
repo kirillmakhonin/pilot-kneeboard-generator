@@ -58,7 +58,7 @@ export const WeightAndBalanceGenerator: React.FC = () => {
         copySuccess,
         getShareableUrl,
         copyShareableUrl
-    } = useGeneratorData<WeightBalanceData>('weight_balance_data_v1', INITIAL_DATA);
+    } = useGeneratorData<WeightBalanceData>('weight_balance_data_v1', INITIAL_DATA, 'weight-balance');
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect

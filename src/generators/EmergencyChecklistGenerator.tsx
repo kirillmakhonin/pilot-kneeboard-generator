@@ -253,7 +253,7 @@ export const EmergencyChecklistGenerator: React.FC = () => {
         copySuccess,
         getShareableUrl,
         copyShareableUrl
-    } = useGeneratorData<EmergencyChecklistData>('emergency_checklist_data_v2', INITIAL_DATA);
+    } = useGeneratorData<EmergencyChecklistData>('emergency_checklist_data_v2', INITIAL_DATA, 'emergency');
 
     useEffect(() => {
         setIsPdfLibLoaded(true);
