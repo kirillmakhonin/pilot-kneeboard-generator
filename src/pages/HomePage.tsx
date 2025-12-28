@@ -280,6 +280,39 @@ export const HomePage: React.FC = () => {
                                 </Link>
                             </div>
                         </div>
+
+                        {/* Cessna 172M */}
+                        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="bg-teal-100 p-2 rounded-lg">
+                                    <Plane className="text-teal-600" size={20} />
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-slate-900">Cessna 172M Skyhawk</h4>
+                                    <p className="text-xs text-slate-500">Classic training aircraft</p>
+                                </div>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                <Link
+                                    to={`/speeds-briefing?preset=c172m`}
+                                    className="flex-1 text-center px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
+                                >
+                                    Speeds & Briefing
+                                </Link>
+                                <Link
+                                    to={`/weight-balance?preset=c172m`}
+                                    className="flex-1 text-center px-4 py-2 bg-green-50 hover:bg-green-100 text-green-700 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
+                                >
+                                    Weight & Balance
+                                </Link>
+                                <Link
+                                    to={`/emergency?preset=c172m`}
+                                    className="flex-1 text-center px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
+                                >
+                                    Emergency
+                                </Link>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

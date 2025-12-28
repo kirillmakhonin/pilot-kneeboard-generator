@@ -11,10 +11,12 @@ import {
     Upload,
     Check,
     ArrowLeft,
+    Printer,
     FileText
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { PDFButton } from '../components/PDFButton';
+import { PDFButtonWithDropdown } from '../components/PDFButton';
+import type { DropdownOption } from '../components/PDFButton';
 import { ShareButton, ShareModal } from '../components/ShareModal';
 import { generateEmergencyPDF } from '../lib/pdf/generateEmergencyPDF';
 import { useGeneratorData } from '../hooks/useGeneratorData';
@@ -27,6 +29,21 @@ import type {
     EmergencyChecklistGroup
 } from '../types';
 import { EmergencyChecklistType } from '../types';
+
+const PDF_OPTIONS: DropdownOption[] = [
+    {
+        id: 'single',
+        label: 'Single Half-Page',
+        description: '5.5" x 8.5" (portrait)',
+        icon: <FileText className="text-slate-400" size={18} />
+    },
+    {
+        id: 'combo',
+        label: 'Build Letter 2-Up',
+        description: 'Landscape + Cut Mark',
+        icon: <Printer className="text-red-600" size={18} />
+    }
+];
 
 const INITIAL_DATA: EmergencyChecklistData = {
     aircraft: "DA-20",
@@ -243,6 +260,7 @@ export const EmergencyChecklistGenerator: React.FC = () => {
     const [activeSectionIndex, setActiveSectionIndex] = useState(0);
     const [expandedScripts, setExpandedScripts] = useState<Record<string, boolean>>({});
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [pdfLayout, setPdfLayout] = useState<'single' | 'combo'>('single');
 
     const {
         data,
@@ -263,17 +281,19 @@ export const EmergencyChecklistGenerator: React.FC = () => {
     useEffect(() => {
         if (isPdfLibLoaded) {
             try {
-                const url = generateEmergencyPDF(data, 'preview');
+                const url = generateEmergencyPDF(data, 'preview', pdfLayout);
                 setPreviewUrl(url);
             } catch (e) {
                 console.error('Failed to generate preview:', e);
             }
         }
-    }, [data, isPdfLibLoaded]);
+    }, [data, isPdfLibLoaded, pdfLayout]);
 
-    const generatePDF = () => {
+    const generatePDF = (layout: string) => {
         if (!isPdfLibLoaded) return;
-        generateEmergencyPDF(data, 'build');
+        const nextLayout = layout as 'single' | 'combo';
+        setPdfLayout(nextLayout);
+        generateEmergencyPDF(data, 'build', nextLayout);
     };
 
     const handleImportSubmit = () => {
@@ -469,11 +489,13 @@ export const EmergencyChecklistGenerator: React.FC = () => {
 
                     <div className="flex items-center gap-3">
                         <ShareButton onClick={() => setShowShareModal(true)} />
-                        <PDFButton
-                            onClick={generatePDF}
+                        <PDFButtonWithDropdown
+                            onSelect={generatePDF}
                             disabled={!isPdfLibLoaded}
                             loading={!isPdfLibLoaded}
-                            label="Preview PDF"
+                            label="Build PDF"
+                            options={PDF_OPTIONS}
+                            defaultOptionId={pdfLayout}
                         />
                     </div>
                 </div>

@@ -92,11 +92,59 @@ export const C172N_DATA = {
         { label: "V_Y - Best Rate of Climb", value: "75 Kts" },
         { label: "V_X - Best Angle of Climb", value: "60 Kts" },
         { label: "V_A - Max Maneuvering Speed", value: "80-95 Kts" },
-        { label: "V_FE - Max Flap Ext", value: "85 Kts" },
-        { label: "V_NO - Mac Cruise", value: "128 Kts" },
+        { label: "V_FE - Max Flap Ext Speed", value: "85 Kts" },
+        { label: "V_NO - Max Cruise Speed", value: "128 Kts" },
         { label: "V_NE - Never Exceed Speed", value: "160 Kts" },
         { label: "V_S - Stall Speed Clean", value: "53 Kts" },
         { label: "V_SO - Stall Speed Flaps FULL", value: "48 Kts" }
+    ],
+    takeoff: [
+        { label: "V_R - Rotation Speed", value: "55 Kts" },
+        { label: "V_Y - Best Rate of Climb", value: "75 Kts" },
+        { label: "V_X - Best Angle of Climb", value: "60 Kts" },
+    ],
+    landing: [
+        { label: "Normal Approach (Flaps Up)", value: "60-70 Kts" },
+        { label: "Normal Approach (Flaps 40°)", value: "55-65 Kts" },
+        { label: "Short Field Approach", value: "60 Kts" },
+        { label: "Max Demonstrated X-Wind", value: "15 Kts" }
+    ],
+    emergency: [
+        { label: "Best Glide", value: "65 Kts" },
+        { label: "Glide Ratio", value: "9:1" },
+        { label: "Distance per 1000ft AGL", value: "1.5 NM" }
+    ],
+    briefing: [
+        { title: "SAFETY BRIEFING", content: "**S** - Seatbelts fastened \n**A** - Air vents overhead/panel. \n**F** - Fire extinguisher between seats. \n**E** - Doors and luggage door. \n**T** - No talking during takeoff/landing. Point out traffic. \n**Y** - Any questions?" },
+
+        // Takeoff Briefing
+        { title: "Type of Takeoff", content: "Normal takeoff, flaps up. Rotation at 55 knots, climb out at 75 knots." },
+        { title: "Runway", content: "Departing Runway [RW]. Full length available." },
+        { title: "Abnormal on Runway", content: "If any abnormality occurs before rotation, I will close the throttle and stop straight ahead." },
+        { title: "Engine Failure < 1000' AGL", content: "If engine fails after rotation with runway remaining, I will land on the runway. If runway is insufficient and below 1000', I will pick a field 30° left or right of nose. No turns back." },
+        { title: "Engine Failure > 1000' AGL", content: "If above 1000', I will check if a return to the airport is possible or select the best field." },
+
+        { title: "Short Field Takeoff", content: "Flaps UP. I will hold the brakes, apply full power, and check gauges. Release brakes, rotate at 55 knots. Climb at 59 knots until clear of the obstacle, then accelerate to 73 knots." },
+        { title: "Soft Field Takeoff", content: "Flaps 10°. I will keep the nose wheel light and lift off as soon as possible. I will stay in ground effect to accelerate to 55 knots, then climb out gently." },
+        { title: "Normal Landing", content: "Flaps 40°. Final approach at 65 knots. Aiming for the numbers." },
+        { title: "Short Field Landing", content: "Flaps 40°. Steep approach at 60 knots. I will cut power over the obstacles, touch down on the aiming point, retract flaps immediately, and apply heavy braking." },
+        { title: "Soft Field Landing", content: "Flaps 40°. I will carry a small amount of power to cushion the landing. I will hold the nose wheel off the ground as long as possible and use minimum braking." },
+    ]
+};
+
+export const C172M_DATA = {
+    aircraftModel: "CESSNA 172M SKYHAWK",
+    footer: "",
+    speeds: [
+        { label: "V_R - Rotate Speed", value: "55 Kts" },
+        { label: "V_Y - Best Rate of Climb", value: "75 Kts" },
+        { label: "V_X - Best Angle of Climb", value: "60 Kts" },
+        { label: "V_A - Max Maneuvering Speed", value: "80-95 Kts" },
+        { label: "V_FE - Max Flap Ext Speed", value: "85 Kts" },
+        { label: "V_NO - Max Cruise Speed", value: "130 Kts" },
+        { label: "V_NE - Never Exceed Speed", value: "160 Kts" },
+        { label: "V_S - Stall Speed Clean", value: "45 Kts" },
+        { label: "V_SO - Stall Speed Flaps FULL", value: "35 Kts" }
     ],
     takeoff: [
         { label: "V_R - Rotation Speed", value: "55 Kts" },
@@ -174,6 +222,25 @@ export const C172N_WB_DATA = {
     aircraft: "Cessna 172N",
     tailNumber: "N738NY",
     makeModel: "CESSNA 172N SKYHAWK",
+    date: new Date().toISOString().split('T')[0],
+    category: "Normal",
+    maxTakeoffWeight: "2300",
+    referenceDatum: "40.0",
+    positions: [
+        { name: "Basic Empty Weight", weight: "1458", arm: "39.1", moment: "56997" },
+        { name: "Front Occupants", weight: "340", arm: "37.0", moment: "12580" },
+        { name: "Rear Occupants", weight: "340", arm: "73.0", moment: "24820" },
+        { name: "Fuel (48 gal usable)", weight: "288", arm: "48.0", moment: "13824" },
+        { name: "Baggage Area 1 (120 lb)", weight: "0", arm: "95.0", moment: "0" },
+        { name: "Baggage Area 2 (50 lb)", weight: "0", arm: "123.0", moment: "0" }
+    ],
+    footer: ""
+};
+
+export const C172M_WB_DATA = {
+    aircraft: "Cessna 172M",
+    tailNumber: "",
+    makeModel: "CESSNA 172M SKYHAWK",
     date: new Date().toISOString().split('T')[0],
     category: "Normal",
     maxTakeoffWeight: "2300",
@@ -372,6 +439,10 @@ export const C172N_EMERGENCY_DATA = {
     footer: "DATA DERIVED FROM 1977 CESSNA 172N POH SECTION 3."
 };
 
+export const C172M_EMERGENCY_DATA = JSON.parse(JSON.stringify(C172N_EMERGENCY_DATA)) as typeof C172N_EMERGENCY_DATA;
+C172M_EMERGENCY_DATA.aircraft = "CESSNA 172M SKYHAWK";
+C172M_EMERGENCY_DATA.footer = "DATA DERIVED FROM 1977 CESSNA 172M POH SECTION 3.";
+
 export const DA20_EMERGENCY_DATA = {
     aircraft: "DIAMOND DA20-C1",
     sections: [
@@ -561,16 +632,19 @@ export const SPEEDS_PRESETS = {
     'da20-c1': DA20_SPEEDS_DATA,
     'c172s': C172S_SPEEDS_DATA,
     'c172n': C172N_DATA,
+    'c172m': C172M_DATA,
 };
 
 export const WEIGHT_BALANCE_PRESETS = {
     'da20-c1': DA20_WEIGHT_BALANCE_DATA,
     'c172s': C172S_WB_DATA,
     'c172n': C172N_WB_DATA,
+    'c172m': C172M_WB_DATA,
 };
 
 export const EMERGENCY_PRESETS = {
     'da20-c1': DA20_EMERGENCY_DATA,
     'c172s': C172S_EMERGENCY_DATA,
     'c172n': C172N_EMERGENCY_DATA,
+    'c172m': C172M_EMERGENCY_DATA,
 };

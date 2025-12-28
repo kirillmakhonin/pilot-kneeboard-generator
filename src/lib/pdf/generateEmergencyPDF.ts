@@ -14,6 +14,8 @@ const MARGIN = 8;
 const CONTENT_WIDTH = PAGE_WIDTH - (MARGIN * 2);
 const COLUMN_WIDTH = (CONTENT_WIDTH - 4) / 2; // 4mm gap between columns
 const FOOTER_HEIGHT = 12;
+const SHEET_WIDTH = 279.4;
+const SHEET_HEIGHT = 215.9;
 
 interface RenderContext {
     doc: jsPDF;
@@ -23,6 +25,10 @@ interface RenderContext {
     isEmergencyType: boolean;
     headerText: string;
     footer: string;
+    xOffset: number;
+    sheetWidth: number;
+    sheetHeight: number;
+    allowAddPages: boolean;
 }
 
 const getTypeColor = (isEmergency: boolean): [number, number, number] => {
@@ -40,7 +46,12 @@ const getTypeTextColor = (isEmergency: boolean): [number, number, number] => {
 const checkPageBreak = (ctx: RenderContext, neededHeight: number): boolean => {
     if (ctx.currentY + neededHeight > PAGE_HEIGHT - FOOTER_HEIGHT - MARGIN) {
         addFooter(ctx);
-        ctx.doc.addPage([PAGE_WIDTH, PAGE_HEIGHT]);
+
+        if (ctx.allowAddPages) {
+            ctx.doc.addPage([ctx.sheetWidth, ctx.sheetHeight]);
+        } else {
+            ctx.doc.setPage(ctx.currentPage + 1);
+        }
         ctx.currentPage++;
         ctx.currentY = MARGIN + 8;
         drawHeaderRepeat(ctx);
@@ -115,7 +126,7 @@ const addFooter = (ctx: RenderContext) => {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(7);
     doc.setTextColor(120);
-    doc.text(footer, PAGE_WIDTH / 2, PAGE_HEIGHT - 6, { align: 'center' });
+    doc.text(footer, ctx.xOffset + (PAGE_WIDTH / 2), PAGE_HEIGHT - 6, { align: 'center' });
     doc.setTextColor(40);
 };
 
@@ -125,23 +136,32 @@ const drawHeaderRepeat = (ctx: RenderContext) => {
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(7);
     doc.setTextColor(r, g, b);
-    doc.text(headerText.toUpperCase(), PAGE_WIDTH / 2, MARGIN + 3, { align: 'center' });
+    doc.text(headerText.toUpperCase(), ctx.xOffset + (PAGE_WIDTH / 2), MARGIN + 3, { align: 'center' });
     doc.setTextColor(40);
 };
 
-export const generateEmergencyPDF = (data: EmergencyChecklistData, mode: 'preview' | 'build' = 'build'): string | null => {
-    const doc = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: [PAGE_WIDTH, PAGE_HEIGHT]
-    });
+const drawCenterCutMark = (doc: jsPDF, x: number, sheetHeight: number) => {
+    doc.setDrawColor(180, 180, 180);
+    doc.setLineWidth(0.1);
+    doc.setLineDashPattern([2, 2], 0);
+    doc.line(x, 0, x, sheetHeight);
+    doc.setLineDashPattern([], 0);
+};
 
+const renderEmergencyDocument = (
+    doc: jsPDF,
+    data: EmergencyChecklistData,
+    mode: 'preview' | 'build',
+    xOffset: number,
+    sheetWidth: number,
+    sheetHeight: number,
+    allowAddPages: boolean
+) => {
     doc.setFont('helvetica');
 
     let currentY = MARGIN;
     let currentPage = 1;
 
-    // 1. Aircraft & Tail Number header (red, bold, small)
     const headerText = [data.aircraft, data.tailNumber]
         .filter(Boolean)
         .join(' • ');
@@ -151,12 +171,12 @@ export const generateEmergencyPDF = (data: EmergencyChecklistData, mode: 'previe
     const [r, g, b] = getTypeColor(true);
     doc.setTextColor(r, g, b);
 
-    const headerSpacing = 4; // mm between repeated headers
+    const headerSpacing = 4;
     const headerWidth = doc.getTextWidth(headerText.toUpperCase());
     const availableWidth = CONTENT_WIDTH;
     const repeatCount = Math.floor((availableWidth + headerSpacing) / (headerWidth + headerSpacing));
     const totalWidth = repeatCount * headerWidth + (repeatCount - 1) * headerSpacing;
-    const startX = MARGIN + (CONTENT_WIDTH - totalWidth) / 2;
+    const startX = xOffset + MARGIN + (CONTENT_WIDTH - totalWidth) / 2;
 
     for (let i = 0; i < repeatCount; i++) {
         const x = startX + i * (headerWidth + headerSpacing) + headerWidth / 2;
@@ -164,42 +184,34 @@ export const generateEmergencyPDF = (data: EmergencyChecklistData, mode: 'previe
     }
     currentY += 8;
 
-    // 2. IMMEDIATE ACTION header (full width, bold, red background)
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(36);
     const [headerR, headerG, headerB] = getTypeColor(true);
     doc.setTextColor(headerR, headerG, headerB);
-    doc.text('IMMEDIATE ACTION', PAGE_WIDTH / 2, currentY + 7.5, { align: 'center' });
-    // Draw text twice for extra bold effect
-    doc.text('IMMEDIATE ACTION', PAGE_WIDTH / 2, currentY + 7.5, { align: 'center' });
+    doc.text('IMMEDIATE ACTION', xOffset + (PAGE_WIDTH / 2), currentY + 7.5, { align: 'center' });
+    doc.text('IMMEDIATE ACTION', xOffset + (PAGE_WIDTH / 2), currentY + 7.5, { align: 'center' });
     currentY += 10;
 
     doc.setTextColor(40);
 
-    // Track column positions
-    const leftColumnX = MARGIN;
-    const rightColumnX = MARGIN + COLUMN_WIDTH + 4;
+    const leftColumnX = xOffset + MARGIN;
+    const rightColumnX = xOffset + MARGIN + COLUMN_WIDTH + 4;
     let leftColumnY = currentY;
     let rightColumnY = currentY;
     let useLeftColumn = true;
 
-    // Process each section
     data.sections.forEach((section) => {
         const isEmergency = section.type === 'EMERGENCY';
         const hasMultipleScripts = section.scripts.length > 1;
 
-        // Determine column usage
         if (hasMultipleScripts) {
-            // Use both columns, start fresh row
             const maxY = Math.max(leftColumnY, rightColumnY);
             leftColumnY = maxY + 2;
             rightColumnY = maxY + 2;
             useLeftColumn = true;
         }
 
-        // Draw section header (spans width if single script, or per-column if multiple)
         if (!hasMultipleScripts) {
-            // Single script - use one column
             const columnX = useLeftColumn ? leftColumnX : rightColumnX;
             const columnY = useLeftColumn ? leftColumnY : rightColumnY;
 
@@ -210,14 +222,16 @@ export const generateEmergencyPDF = (data: EmergencyChecklistData, mode: 'previe
                 columnX,
                 isEmergencyType: isEmergency,
                 headerText,
-                footer: data.footer
+                footer: data.footer,
+                xOffset,
+                sheetWidth,
+                sheetHeight,
+                allowAddPages
             };
 
-            // Check if entire section fits on page
             const sectionHeight = estimateSectionHeight(section);
             checkPageBreak(ctx, sectionHeight);
 
-            // Draw section with single script
             const newY = drawSection(ctx, section, COLUMN_WIDTH);
 
             if (useLeftColumn) {
@@ -228,7 +242,6 @@ export const generateEmergencyPDF = (data: EmergencyChecklistData, mode: 'previe
             useLeftColumn = !useLeftColumn;
             currentPage = ctx.currentPage;
         } else {
-            // Multiple scripts - draw section header spanning both columns first
             const ctx: RenderContext = {
                 doc,
                 currentY: leftColumnY,
@@ -236,21 +249,22 @@ export const generateEmergencyPDF = (data: EmergencyChecklistData, mode: 'previe
                 columnX: leftColumnX,
                 isEmergencyType: isEmergency,
                 headerText,
-                footer: data.footer
+                footer: data.footer,
+                xOffset,
+                sheetWidth,
+                sheetHeight,
+                allowAddPages
             };
 
-            // Check if entire section fits on page
             const sectionHeight = estimateSectionHeight(section);
             checkPageBreak(ctx, sectionHeight);
             leftColumnY = ctx.currentY;
             rightColumnY = ctx.currentY;
 
-            // Section header across full width
             drawSectionHeader(ctx, section.title, CONTENT_WIDTH, isEmergency);
             leftColumnY = ctx.currentY + 2;
             rightColumnY = ctx.currentY + 2;
 
-            // Draw scripts in columns
             section.scripts.forEach((script, idx) => {
                 const isLeft = idx % 2 === 0;
                 const columnX = isLeft ? leftColumnX : rightColumnX;
@@ -263,7 +277,11 @@ export const generateEmergencyPDF = (data: EmergencyChecklistData, mode: 'previe
                     columnX,
                     isEmergencyType: isEmergency,
                     headerText,
-                    footer: data.footer
+                    footer: data.footer,
+                    xOffset,
+                    sheetWidth,
+                    sheetHeight,
+                    allowAddPages
                 };
 
                 checkPageBreak(scriptCtx, 30);
@@ -278,7 +296,6 @@ export const generateEmergencyPDF = (data: EmergencyChecklistData, mode: 'previe
                 currentPage = scriptCtx.currentPage;
             });
 
-            // Reset both columns to end of section (sync them)
             const maxY = Math.max(leftColumnY, rightColumnY);
             leftColumnY = maxY + 2;
             rightColumnY = maxY + 2;
@@ -287,27 +304,59 @@ export const generateEmergencyPDF = (data: EmergencyChecklistData, mode: 'previe
         }
     });
 
-    // Final footer
     const finalCtx: RenderContext = {
         doc,
         currentY: Math.max(leftColumnY, rightColumnY),
         currentPage,
-        columnX: MARGIN,
+        columnX: leftColumnX,
         isEmergencyType: true,
         headerText,
-        footer: data.footer
+        footer: data.footer,
+        xOffset,
+        sheetWidth,
+        sheetHeight,
+        allowAddPages
     };
     addFooter(finalCtx);
 
-    // Return based on mode
+    if (mode === 'preview') {
+        return;
+    }
+};
+
+export const generateEmergencyPDF = (
+    data: EmergencyChecklistData,
+    mode: 'preview' | 'build' = 'build',
+    layout: 'single' | 'combo' = 'single'
+): string | null => {
+    const isCombo = layout === 'combo';
+    const doc = new jsPDF({
+        orientation: isCombo ? 'landscape' : 'portrait',
+        unit: 'mm',
+        format: isCombo ? 'letter' : [PAGE_WIDTH, PAGE_HEIGHT]
+    });
+
+    renderEmergencyDocument(doc, data, mode, 0, isCombo ? SHEET_WIDTH : PAGE_WIDTH, isCombo ? SHEET_HEIGHT : PAGE_HEIGHT, true);
+
+    if (isCombo) {
+        doc.setPage(1);
+        renderEmergencyDocument(doc, data, mode, PAGE_WIDTH, SHEET_WIDTH, SHEET_HEIGHT, false);
+
+        const pagesAfter = doc.getNumberOfPages();
+        for (let page = 1; page <= pagesAfter; page++) {
+            doc.setPage(page);
+            drawCenterCutMark(doc, PAGE_WIDTH, SHEET_HEIGHT);
+        }
+    }
+
     if (mode === 'preview') {
         return doc.output('datauristring');
-    } else {
-        const pdfBlob = doc.output('blob');
-        const url = URL.createObjectURL(pdfBlob);
-        window.open(url, '_blank');
-        return null;
     }
+
+    const pdfBlob = doc.output('blob');
+    const url = URL.createObjectURL(pdfBlob);
+    window.open(url, '_blank');
+    return null;
 };
 
 const drawSection = (
